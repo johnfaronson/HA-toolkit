@@ -137,12 +137,16 @@ echo "show slave status\G" | $MYSQLCLIENT | awk '
 '
 echo "select value from global_configuration_local where name = 'appserver.mode'\G" | $MYSQLCLIENT | awk '
 
-	/value:/ { if ($2 == "active") active = 1; else active = 0; }
+	/value:/ 
+		{ 
+			if ($2 == "active") active = 1; else active = 0;
+			if ($2 == "passive") passive = 1; else passive = 0; 
+		}
 
 	END { 
 		printf("name=Custom Metrics|Mysql|Appserver Active,aggregator=OBSERVATION,value=%d\n", active);
-	}
-'
+		printf("name=Custom Metrics|Mysql|Appserver Passive,aggregator=OBSERVATION,value=%d\n", passive);
+	}'
 
 SLEEPTIME=`date +"$NEXTSECONDS %s" | awk '{if ($1 > $2) print $1 - $2; else print 0;}'`
 sleep $SLEEPTIME
