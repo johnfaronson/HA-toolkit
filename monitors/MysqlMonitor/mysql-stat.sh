@@ -128,8 +128,9 @@ echo "show engine innodb status\G" | $MYSQLCLIENT | awk '
 '
 
 echo "show slave status\G" | $MYSQLCLIENT | awk '
+	BEGIN { spm = 1000000 }
 
-	/Seconds_Behind_Master:/ { spm = $2; }
+	/Seconds_Behind_Master:/ { if (length($2) > 0 && $2 != "null") spm = $2; }
 
 	END { 
 		printf("name=Custom Metrics|Mysql|Slave Seconds Behind Master,aggregator=OBSERVATION,value=%d\n", spm);
